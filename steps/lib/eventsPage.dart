@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-
-void main() => runApp(MaterialApp(home: EventsPage(title: 'Event Page')));
+import 'package:qr_flutter/qr_flutter.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 
 class EventsPage extends StatefulWidget {
   const EventsPage({Key? key, required this.title}) : super(key: key);
@@ -65,7 +65,7 @@ class _EventsPageState extends State<EventsPage> {
 
   String _generateBookingKey(int userId, List<int> eventIds) {
     DateTime now = DateTime.now();
-    String bookingKey = '$userId-${eventIds.join('-')}-00000000';
+    String bookingKey = '$userId-${eventIds.join('-')}';
     print('Booking Key: $bookingKey'); // Print booking key to terminal
     return bookingKey;
   }
@@ -89,13 +89,18 @@ class _EventsPageState extends State<EventsPage> {
           itemBuilder: (context, index) {
             int eventId = index + 1;
 
-            return EventCard(
+            return EventCard(onScanQR: () async{
+              String barcodeScanRes;
+
+              barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
+                  "#ff6666", "Cancel", true, ScanMode.QR);
+              print(barcodeScanRes);
+            },Entrypoint: "!",
               eventName: eventNames[index],
               isBooked: bookings[index],
               onBookPressed: () async {
-                // Assume you have a user ID and event IDs
-                int userId = 1; // Replace with the actual user ID
-                List<int> eventIds = [eventId, eventId+1]; // Event ID(s) for the booking
+                int userId = 1;
+                List<int> eventIds = [eventId, eventId+1];
 
                 String bookingKey = _generateBookingKey(userId, eventIds);
 
@@ -107,7 +112,7 @@ class _EventsPageState extends State<EventsPage> {
                 });
               },
               hasBooking: existingKeys.containsKey(eventId),
-              bookingKey: existingKeys[eventId] ?? '', // Pass the booking key to EventCard
+              bookingKey: existingKeys[eventId] ?? '',
             );
           },
         ),
@@ -121,6 +126,8 @@ class EventCard extends StatelessWidget {
   final bool hasBooking;
   final VoidCallback onBookPressed;
   final String bookingKey;
+  final VoidCallback onScanQR;
+  final String Entrypoint;
 
   const EventCard({
     required this.eventName,
@@ -128,6 +135,8 @@ class EventCard extends StatelessWidget {
     required this.hasBooking,
     required this.onBookPressed,
     required this.bookingKey,
+    required this.onScanQR,
+    required this.Entrypoint,
   });
 
   void _showTicketDetails(BuildContext context) {
@@ -183,7 +192,7 @@ class EventCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               ElevatedButton(
-                onPressed: !isBooked && !hasBooking ? onBookPressed : null,
+                onPressed: !isBooked && !hasBooking ? onBookPressed : onScanQR,
                 child: Text(isBooked ? "Scan QR" : "Book Seat"),
               ),
               ElevatedButton(
@@ -197,3 +206,4 @@ class EventCard extends StatelessWidget {
     );
   }
 }
+
