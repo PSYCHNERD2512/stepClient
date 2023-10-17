@@ -30,6 +30,8 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_secure_storage: ^5.0.2
+  qr_code_scanner: ^0.7.0
+
 
 
 
