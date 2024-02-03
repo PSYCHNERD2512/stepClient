@@ -1,5 +1,10 @@
 # stepClient Documentation
 
+## Design
+
+![image](https://github.com/PSYCHNERD2512/stepClient/assets/33757242/aa934a4e-d0ac-4f98-a765-b1d82f265e6a)
+
+
 ## Registration
 
 - A unique ID is generated for the user account.
